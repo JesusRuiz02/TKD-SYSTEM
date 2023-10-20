@@ -7,13 +7,15 @@ using UnityEngine.UIElements;
 
 public class DetectionManager : MonoBehaviour
 {
+    [SerializeField] private bool TeamCombat = default; 
+    private ScoreManager scoreManager = default;
+    private TeamCombatScoreManager teamCombatScoreManager = default;
     [SerializeField] private bool _breakflag = default;
     [SerializeField] private float _windowIsOpened = 1f;
     [SerializeField] private int[] blueCounter = default;
     [SerializeField] private int[] redCounter = default;
     [SerializeField] private GameObject _scoreManager = default;
     [SerializeField] private bool isPaused = false;
-    [SerializeField] private GameObject _battleManager = default;
     [Header("Images")]
     [SerializeField] private GameObject _chestPlateBlue = default;
     [SerializeField] private GameObject _chestPlateRed = default;
@@ -39,7 +41,6 @@ public class DetectionManager : MonoBehaviour
             {
                 blueCounter[numAction]++;
             }
-
             switch (numAction)
             {
                 case 0:
@@ -73,8 +74,9 @@ public class DetectionManager : MonoBehaviour
         {
                 if (redCounter[numAction] == minim_votes)
                 {
-                    _scoreManager.GetComponent<ScoreManager>().scoreManager(isRed, numAction);
-                    StopCoroutine(CounterReset(isRed,numAction));
+                    if (!TeamCombat) scoreManager.scoreManager(true, numAction);
+                    else teamCombatScoreManager.scoreManager(true, numAction);
+                    StopCoroutine(CounterReset(true,numAction));
                     redCounter[numAction] = 0;
                 }
         }
@@ -82,8 +84,9 @@ public class DetectionManager : MonoBehaviour
         {
                 if (blueCounter[numAction] == minim_votes)
                 {
-                    _scoreManager.GetComponent<ScoreManager>().scoreManager(isRed, numAction);
-                    StopCoroutine(CounterReset(isRed,numAction));
+                    if (!TeamCombat) scoreManager.scoreManager(false, numAction);
+                    else teamCombatScoreManager.scoreManager(false, numAction);
+                    StopCoroutine(CounterReset(false,numAction));
                     blueCounter[numAction] = 0;
                 }
         }
@@ -92,8 +95,8 @@ public class DetectionManager : MonoBehaviour
     private void InstanceSymbol( bool isRed, int numController, GameObject images, Vector2 position)
     {
          var image = Instantiate(images, position, quaternion.identity);
-       image.GetComponent<ControllerIdentifier>().Translation(numController,isRed);
-       Destroy(image, _windowIsOpened);
+        image.GetComponent<ControllerIdentifier>().Translation(numController,isRed);
+        Destroy(image, _windowIsOpened);
     }
     private IEnumerator CounterReset(bool isRed, int actionNum)
     {
@@ -101,16 +104,12 @@ public class DetectionManager : MonoBehaviour
         if (isRed)
         {
             if (redCounter[actionNum] > 0)
-            {
                 redCounter[actionNum]--;
-            }
         }
         else
         {
             if (blueCounter[actionNum] > 0)
-            {
                 blueCounter[actionNum]--;
-            }
         }
     }
 
@@ -165,7 +164,8 @@ public class DetectionManager : MonoBehaviour
     private void Start()
     {
         _scoreManager = GameObject.FindGameObjectWithTag("ScoreManager");
-        _battleManager = GameObject.FindGameObjectWithTag("Data");
-        _windowIsOpened = _battleManager.GetComponent<BattleManager>().WindowTime;
+        teamCombatScoreManager = TeamCombat ? _scoreManager.GetComponent<TeamCombatScoreManager>() : null;
+        scoreManager = !TeamCombat ? _scoreManager.GetComponent<ScoreManager>() : null;
+        _windowIsOpened = BattleManager.instance.WindowTime;
     }
 }

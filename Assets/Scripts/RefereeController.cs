@@ -93,7 +93,7 @@ public class RefereeController : MonoBehaviour
             }
         }
     }
-   /* public void TwistRed(InputAction.CallbackContext context)
+    public void TwistRed(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
@@ -117,7 +117,7 @@ public class RefereeController : MonoBehaviour
             }
         }
     }
-*/
+
     private IEnumerator ResetDelay(int action, bool isRed)
     {
         yield return new WaitForSeconds(timerDelay);

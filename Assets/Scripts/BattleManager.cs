@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public class BattleManager : MonoBehaviour
 {
+    public static BattleManager instance;
+    
     [Header("RoundData")]
     [SerializeField] private int _numberOfRounds = 3;
     [SerializeField] private float _maxTimerInSeconds = 90;
@@ -34,6 +36,8 @@ public class BattleManager : MonoBehaviour
     public int NumberOfMembers => _numberOfMembers;
     public float FirstRoundDuration => _firstRoundEachMember;
     
+    
+    
     private void OnDestroy()
     {
          SaveData();
@@ -42,6 +46,16 @@ public class BattleManager : MonoBehaviour
     private void Awake()
     {
        LoadData();
+       
+       if(instance == null)
+       {
+           instance = this;
+       }
+       else
+       {
+           Destroy(gameObject);
+       }
+       
     }
 
     private void SaveData()

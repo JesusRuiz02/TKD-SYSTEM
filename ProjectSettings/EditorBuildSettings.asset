@@ -13,8 +13,8 @@ EditorBuildSettings:
     guid: 68eb622262a246345aa90e260012b455
   - enabled: 1
     path: Assets/Scenes/5vs5.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
+    guid: 6d23484c6062efb4da9bf71d4b67972a
   - enabled: 1
     path: Assets/Scenes/1vs1.unity
-    guid: 6d23484c6062efb4da9bf71d4b67972a
+    guid: fb934f53c896a9547a2a19d5271d5bf1
   m_configObjects: {}

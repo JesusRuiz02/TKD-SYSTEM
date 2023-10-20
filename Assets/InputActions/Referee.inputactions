@@ -206,7 +206,7 @@
                     "path": "<Keyboard>/u",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Keyboard",
                     "action": "RedHelmet",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -214,7 +214,7 @@
                 {
                     "name": "",
                     "id": "4543fb21-f8d3-4b19-aebb-40779021fa50",
-                    "path": "<Gamepad>/buttonWest",
+                    "path": "<Gamepad>/leftStickPress",
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
@@ -225,7 +225,7 @@
                 {
                     "name": "",
                     "id": "0b9c1442-3a78-4d9a-bddf-d3a11485b406",
-                    "path": "<Gamepad>/buttonEast",
+                    "path": "<Gamepad>/rightStickPress",
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",

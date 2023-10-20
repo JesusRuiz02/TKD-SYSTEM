@@ -1,7 +1,7 @@
-using TMPro;
 using UnityEngine;
+using TMPro;
 
-public class ScoreManager : MonoBehaviour
+public class TeamCombatScoreManager : MonoBehaviour
 {
     Timer _timer;
     [SerializeField] private GameObject _deciderCanvas = default;
@@ -66,11 +66,10 @@ public class ScoreManager : MonoBehaviour
 
     private void DifferenceCheck()
     {
-       float difference = Mathf.Abs(RedScore - BlueScore);
+        float difference = Mathf.Abs(RedScore - BlueScore);
         if (difference >= BattleManager.instance.PointDifference)
         {
-            _timer._timerIsOn = false;
-            _timer.RoundCheckChange();
+            DeterminateWinner();
         }
     }
     
@@ -81,13 +80,11 @@ public class ScoreManager : MonoBehaviour
         UpdateText(RedText, RedScore);
         if (BlueGameJeum >= BattleManager.instance.GameJeum)
         {
-            WinnerRound(true);
-            _timer._timerIsOn = false;
+            ColorWinner(RedColor);
         }
         if (RedGameJeum >= BattleManager.instance.GameJeum)
         {
-            WinnerRound(false);
-            _timer._timerIsOn = false;
+            ColorWinner(BlueColor);
         }
     }
 
@@ -165,55 +162,22 @@ public class ScoreManager : MonoBehaviour
 
     public void DeterminateWinner()
     {
-        if (RedRoundWins > BlueRoundWins)
+        if (RedScore > BlueScore)
         {
            ColorWinner(RedColor);
         }
-        else if (BlueRoundWins > RedRoundWins)
+        else if (BlueScore > RedScore)
         {
             ColorWinner(BlueColor);
         }
-        else if (BlueRoundWins == RedRoundWins)
+        else if (BlueScore == RedScore)
         {
             RestartScore();
             _deciderCanvas.SetActive(true);
             StopTimer();
         }
     }
-
-    private void WinnerRound(bool redWins)
-    {
-        if (redWins)
-        {
-            RedRoundWins++;
-            UpdateText(_redRoundsTXT, RedRoundWins);
-        }
-        else
-        {
-            BlueRoundWins++;
-            UpdateText(_blueRoundsTXT, BlueRoundWins);
-        }
-        RestartScore();
-        UpdateText(_RedGamJeom,RedGameJeum);
-        UpdateText(_BlueGamJeom,BlueGameJeum);
-    }
-
-    public void WinnerRoundCheck()
-    {
-        if (RedScore > BlueScore)
-        {
-            WinnerRound(true);
-        }
-        else if(BlueScore > RedScore)
-        {
-           WinnerRound(false);
-        }
-        else if(BlueScore == RedScore)
-        {
-           WinnerRound(false);
-           WinnerRound(true);
-        }
-    }
+    
 
     private void RestartScore()
     {

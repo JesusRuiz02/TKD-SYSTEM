@@ -5,15 +5,15 @@ using TMPro;
 public class Timer : MonoBehaviour
 {
     private float _timeLeft = default;
-    private float _timeBreak = default;
-    private float _breakDuration = default;
-    private GameObject _dataManager = default;
-    private float roundDuration = default;
-    [SerializeField] private TextMeshProUGUI _breakTxt = default;
-    [SerializeField] private bool _timerIsOn = true;
-    [SerializeField] private bool teamCombat = false;
-    private int _numRounds = default;
+    
+    [SerializeField] private TextMeshProUGUI _breakTxt = default; 
+    public bool _timerIsOn = true;
+   
     private int _actualRound = 1;
+    private float _numRounds = default;
+    private float _timeBreak = default;
+    private float roundDuration = default;
+    private float _breakDuration = default;
     [SerializeField] private GameObject _break = default;
     [SerializeField] private TextMeshProUGUI _TimerTxt = default;
     [SerializeField] private TextMeshProUGUI _roundTxt = default;
@@ -27,13 +27,12 @@ public class Timer : MonoBehaviour
     {
         _chicharra = GetComponent<AudioSource>();
         _scoreManager = GetComponent<ScoreManager>();
-        _dataManager = GameObject.FindGameObjectWithTag("Data");
-        _numRounds = _dataManager.GetComponent<BattleManager>().NumberOfRounds;
-        roundDuration = _dataManager.GetComponent<BattleManager>().MaxTimerInSeconds;
-        _breakDuration = _dataManager.GetComponent<BattleManager>().BreakDuration;
+        _numRounds = BattleManager.instance.NumberOfRounds;
+        roundDuration = BattleManager.instance.MaxTimerInSeconds; 
+        _breakDuration = BattleManager.instance.BreakDuration; 
         _timeBreak = _breakDuration;
-        _timeLeft = teamCombat ? _dataManager.GetComponent<BattleManager>().FirstRoundDuration * _dataManager.GetComponent<BattleManager>().NumberOfMembers : roundDuration;
-        if (teamCombat)
+        _timeLeft = _5vs5 != null ? BattleManager.instance.FirstRoundDuration  *  BattleManager.instance.NumberOfMembers : BattleManager.instance.MaxTimerInSeconds;
+        if (_5vs5 != null)
         {
             RepeatSign();
         }
@@ -55,10 +54,7 @@ public class Timer : MonoBehaviour
         }
         else
         {
-            DetectionManager.GetComponent<DetectionManager>().breakOn();
-            _TimerTxt.enabled = false;
             BreakTime();
-            UpdateTimer(_timeBreak, _breakTxt);
         }
 
         if (_actualRound == _numRounds)
@@ -66,7 +62,7 @@ public class Timer : MonoBehaviour
             Destroy(buttonNextRound);
         }
     }
-
+    
     private void RoundTimer()
     {
         if (_actualRound <= _numRounds)
@@ -79,7 +75,8 @@ public class Timer : MonoBehaviour
             {
                 _chicharra.Play();
                 _timerIsOn = false;
-                RoundChange();
+                if (_5vs5 != null) RoundCheckChange();
+                else RoundChange();
             }
         }
     }
@@ -93,15 +90,22 @@ public class Timer : MonoBehaviour
         _roundTxt.text = _actualRound.ToString("0");
     }
 
+    public void RoundCheckChange()
+    {
+        _scoreManager.WinnerRoundCheck();
+        RoundChange();
+    }
+
     public void RoundChange()
     {
         if (_actualRound <= _numRounds)
         {
             _actualRound++;
             _timeLeft = roundDuration - 1;
+          
         }
 
-        if (teamCombat)
+        if (_5vs5 != null)
         {
             if (_actualRound > 1)
             {
@@ -112,6 +116,9 @@ public class Timer : MonoBehaviour
 
     private void BreakTime()
     {
+        DetectionManager.GetComponent<DetectionManager>().breakOn();
+        _TimerTxt.enabled = false;
+        UpdateTimer(_timeBreak, _breakTxt);
         _break.SetActive(true);
         if (_timeBreak > 0)
         {
@@ -124,15 +131,10 @@ public class Timer : MonoBehaviour
             _timeBreak = _breakDuration;
         }
     }
-
-    public void ActivateTeamCombat()
-    {
-        teamCombat = true;
-    }
-
+    
     private void RepeatSign()
     {
-        InvokeRepeating("ActivateSign", _dataManager.GetComponent<BattleManager>().FirstRoundDuration, _dataManager.GetComponent<BattleManager>().FirstRoundDuration);
+        InvokeRepeating("ActivateSign", BattleManager.instance.FirstRoundDuration ,  BattleManager.instance.FirstRoundDuration);
     }
 
     private void ActivateSign()
