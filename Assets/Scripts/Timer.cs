@@ -19,7 +19,7 @@ public class Timer : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _roundTxt = default;
     [SerializeField] private GameObject DetectionManager = default;
     [SerializeField] private GameObject buttonNextRound;
-    [SerializeField] private GameObject _5vs5 = default;
+    [SerializeField] private TeamCombatScoreManager _5vs5 = default;
     [SerializeField] private AudioSource _chicharra = default;
     private ScoreManager _scoreManager;
 
@@ -109,6 +109,7 @@ public class Timer : MonoBehaviour
         {
             if (_actualRound > 1)
             {
+                Debug.Log("cancela la señal");
                 CancelInvoke("ActivateSign");
             }
         }
@@ -139,7 +140,7 @@ public class Timer : MonoBehaviour
 
     private void ActivateSign()
     {
-        _5vs5.GetComponent<SwitchSign>().ActivateObject();
+        GetComponent<SwitchSign>().ActivateObject();
         _chicharra.Play();
     }
 }

@@ -2039,7 +2039,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _breakTxt: {fileID: 903851383}
   _timerIsOn: 1
-  teamCombat: 0
   _break: {fileID: 1623815095}
   _TimerTxt: {fileID: 1910142080}
   _roundTxt: {fileID: 2100195972}
@@ -2080,7 +2079,6 @@ MonoBehaviour:
   BlueScore: 0
   BlueGameJeum: 0
   RedGameJeum: 0
-  _goldenPoint: 0
   _timerTXT: {fileID: 1910142080}
   _redRoundsTXT: {fileID: 2003634187}
   _blueRoundsTXT: {fileID: 953927786}
@@ -2094,7 +2092,6 @@ MonoBehaviour:
   RedText: {fileID: 172375728}
   RedColor: {fileID: 2028860248}
   BlueColor: {fileID: 771415015}
-  difference: 0
 --- !u!114 &403211968
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3241,6 +3238,18 @@ MonoBehaviour:
       - m_Target: {fileID: 509386340}
         m_TargetAssemblyTypeName: LoadingScreen, Assembly-CSharp
         m_MethodName: StartCombat
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2041210004}
+        m_TargetAssemblyTypeName: PairManager, Assembly-CSharp
+        m_MethodName: DeactivatePlayerInputManager
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6181,6 +6190,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b52e912c0799b647af785fa80c5be4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TeamCombat: 0
   _breakflag: 0
   _windowIsOpened: 1
   blueCounter: 00000000000000000000000000000000
@@ -7757,6 +7767,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2041210002}
   - component: {fileID: 2041210003}
+  - component: {fileID: 2041210004}
   m_Layer: 0
   m_Name: PlayerManager
   m_TagString: Untagged
@@ -7855,6 +7866,20 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!114 &2041210004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041210001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 506ee3b20151efb488d7ea8aa53f8caa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PairCanvas: {fileID: 998112608}
+  _playerInputManager: {fileID: 2041210003}
 --- !u!1 &2052166008
 GameObject:
   m_ObjectHideFlags: 0

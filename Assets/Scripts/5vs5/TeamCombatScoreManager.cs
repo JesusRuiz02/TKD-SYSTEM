@@ -11,15 +11,11 @@ public class TeamCombatScoreManager : MonoBehaviour
     [SerializeField] private int BlueGameJeum = 0;
     [SerializeField] private int RedGameJeum = 0;
     [SerializeField] private TextMeshProUGUI _timerTXT = default;
-    [SerializeField] private TextMeshProUGUI _redRoundsTXT = default;
-    [SerializeField] private TextMeshProUGUI _blueRoundsTXT = default;
     [SerializeField] private TextMeshProUGUI round = default;
     [SerializeField] private TextMeshProUGUI _RedGamJeom = default;
     [SerializeField] private TextMeshProUGUI _BlueGamJeom = default;
     [SerializeField] private GameObject _endCanvas = default;
-    [SerializeField] private int RedRoundWins = default;
-    [SerializeField] private int BlueRoundWins = default;
-    
+
 
     [Header("ScoreManager")] 
     [SerializeField] private TextMeshProUGUI BlueText = default;
