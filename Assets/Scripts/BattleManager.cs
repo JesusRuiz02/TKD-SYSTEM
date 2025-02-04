@@ -1,17 +1,18 @@
-using Unity.VisualScripting;
+
 using UnityEngine;
-using UnityEngine.InputSystem;
+
 
 
 public class BattleManager : MonoBehaviour
 {
     public static BattleManager instance;
-    
+
+    public ViewText viewText;
     [Header("RoundData")]
     [SerializeField] private int _numberOfRounds = 3;
     [SerializeField] private float _maxTimerInSeconds = 90;
     [SerializeField] private int _PointsDifference = 30;
-    [Header("CombatData")]
+    [Header("CombatData1vs1")]
     [SerializeField] private int _gameJeumLimits = 10;
     [SerializeField] private int _chestPlatePoint = 2;
     [SerializeField] private int _helmetPoint = 3;
@@ -19,6 +20,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private int _twistPoint = 4;
     [SerializeField] private float _windowTime = default;
     [SerializeField] private float _breakDuration = 45;
+    [Header("CombatData5vs5")]
     [SerializeField] private float _firstRoundEachMember = 90;
     [SerializeField] private int _numberOfMembers = 3;
 
@@ -72,6 +74,10 @@ public class BattleManager : MonoBehaviour
         PlayerPrefs.SetFloat("breakDuration", _breakDuration);
         PlayerPrefs.SetFloat("firstRoundDuration", _firstRoundEachMember);
         PlayerPrefs.SetInt("NumberOfMember", _numberOfMembers);
+        if (viewText != null)
+        {
+            viewText.ShowText();
+        }
     }
 
     private void LoadData()
@@ -90,194 +96,87 @@ public class BattleManager : MonoBehaviour
         _numberOfMembers = PlayerPrefs.GetInt("NumberOfMember", 3);
     }
 
-    public void PointsDifference(bool insIncreasing)
+    public float ChangeData(float dataToChange, bool isIncreasing)
     {
-        if (_PointsDifference > 0)
+        var addition = 0;
+        if (dataToChange > 0)
         {
-            var addition = insIncreasing ? +1 : -1;
-            _PointsDifference += addition;
+           addition = isIncreasing ? +1 : -1;
+            
         }
         else
         {
-            var addition = 1;
-            _PointsDifference += addition; 
+            addition = 1;
         }
+        dataToChange += addition;
+        return dataToChange;
+    }
+
+    public void PointsDifference(bool isIncreasing)
+    {
+       _PointsDifference = (int)ChangeData(_PointsDifference, isIncreasing);
         SaveData();
     }
   
-    public void Punch(bool insIncreasing)
+    public void Punch(bool isIncreasing)
     {
-        if (_punchPoint > 0)
-        {
-            var addition = insIncreasing ? +1 : -1;
-            _punchPoint += addition;
-        }
-        else
-        {
-            var addition = 1;
-            _punchPoint += addition; 
-        }
+        _punchPoint = (int)ChangeData(_punchPoint, isIncreasing);
         SaveData();
     }
-    public void Helmet(bool insIncreasing)
+    public void Helmet(bool isIncreasing)
     {
-        if (_helmetPoint > 0)
-        {
-            var addition = insIncreasing ? +1 : -1;
-            _helmetPoint += addition;
-        }
-        else
-        {
-            var addition = 1;
-            _helmetPoint += addition; 
-        }
+        _helmetPoint = (int)ChangeData(_helmetPoint, isIncreasing);
         SaveData();
+       
     }
-    public void Twist(bool insIncreasing)
+    public void Twist(bool isIncreasing)
     {
-        if (_twistPoint > 0)
-        {
-            var addition = insIncreasing ? +1 : -1;
-            _twistPoint += addition; 
-        }
-        else
-        {
-            var addition = 1;
-           _twistPoint += addition;
-        }
-        SaveData();
+       _twistPoint = (int)ChangeData(_twistPoint, isIncreasing);
+       SaveData();
     }
     public void Chest(bool isIncreasing)
     {
-        if (_chestPlatePoint > 0)
-        {
-            var addition = isIncreasing ? +1 : -1;
-            _chestPlatePoint += addition; 
-        }
-        else
-        {
-            var addition = 1;
-            _chestPlatePoint += addition;
-        }
+        _chestPlatePoint = (int)ChangeData(_chestPlatePoint, isIncreasing);
         SaveData();
     }
     public void GamJeum(bool isIncreasing)
     {
-        if (_gameJeumLimits > 0)
-        {
-            var addition = isIncreasing ? +1 : -1;
-            _gameJeumLimits += addition;
-        }
-        else
-        {
-            var addition = 1;
-            _gameJeumLimits += addition; 
-        }
+        _gameJeumLimits = (int)ChangeData(_gameJeumLimits, isIncreasing);
         SaveData();
     }
     public void RoundNumber(bool isIncreasing)
     {
-        if (_numberOfRounds > 0)
-        {
-            var addition = isIncreasing ? +1 : -1;
-            _numberOfRounds += addition;
-        }
-        else
-        {
-            var addition = 1;
-            _numberOfRounds += addition; 
-        }
+        _numberOfRounds = (int)ChangeData(_numberOfRounds, isIncreasing);
         SaveData();
     }
 
     public void ReactionTime(bool isIncreasing)
     {
-        if (_windowTime > 0)
-        {
-            var addition = isIncreasing ? + 0.25f : -0.25f;
-            _windowTime += addition;
-        }
-        else
-        {
-            var addition = 0.25f;
-            _windowTime += addition; 
-        }
+        _windowTime = (int)ChangeData(_windowTime, isIncreasing);
         SaveData();
     }
 
     public void BreakIncrease(bool isIncreasing)
     {
-        if (_breakDuration > 0)
-        {
-            var addition = isIncreasing ? +5 : -5;
-           _breakDuration += addition;
-        }
-        else
-        {
-            var addition = 5;
-            _breakDuration += addition; 
-        }
+        _breakDuration = (int)ChangeData(_breakDuration, isIncreasing);
         SaveData();
     }
     
 
     public void RoundDuration(bool isIncreasing)
     {
-        if (_maxTimerInSeconds > 0)
-        {
-            var addition = isIncreasing ? +5 : -5;
-            _maxTimerInSeconds += addition;
-        }
-        else
-        {
-            var addition = 5;
-            _maxTimerInSeconds += addition; 
-        }
+        _maxTimerInSeconds = (int)ChangeData(_maxTimerInSeconds, isIncreasing);
         SaveData();
     }
     public void FirstRDuration(bool isIncreasing)
     {
-        if (_firstRoundEachMember > 0)
-        {
-            var addition = isIncreasing ? +5 : -5;
-            _firstRoundEachMember += addition;
-        }
-        else
-        {
-            var addition = 1;
-            _firstRoundEachMember += addition; 
-        }
+       _firstRoundEachMember = (int)ChangeData(_firstRoundEachMember, isIncreasing);
         SaveData();
     }
 
     public void MemberIncrease(bool isIncreasing)
     {
-        if (_numberOfMembers > 0)
-        {
-            var addition = isIncreasing ? +1 : -1;
-           _numberOfMembers += addition;
-        }
-        else
-        {
-            var addition = 1;
-            _numberOfMembers += addition; 
-        }
+        _numberOfMembers = (int)ChangeData(_numberOfMembers, isIncreasing);
         SaveData();
-    }
-    private void DataIncrease(int datatype, bool isIncreasing)
-    {
-        if (datatype > 0)
-        {
-            var addition = isIncreasing ? +1 : -1;
-            datatype += addition; 
-        }
-        else
-        {
-            var addition = 1;
-            datatype += addition; 
-        }
-        Debug.Log(datatype);
-        SaveData();
-        Debug.Log(datatype);
     }
 }
