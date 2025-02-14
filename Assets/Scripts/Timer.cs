@@ -5,20 +5,11 @@ using TMPro;
 public class Timer : MonoBehaviour
 {
     private float _timeLeft = default;
-    
-    [SerializeField] private TextMeshProUGUI _breakTxt = default; 
-    public bool _timerIsOn = true;
-   
     private int _actualRound = 1;
     private float _numRounds = default;
     private float _timeBreak = default;
     private float roundDuration = default;
     private float _breakDuration = default;
-    [SerializeField] private GameObject _break = default;
-    [SerializeField] private TextMeshProUGUI _TimerTxt = default;
-    [SerializeField] private TextMeshProUGUI _roundTxt = default;
-    [SerializeField] private GameObject DetectionManager = default;
-    [SerializeField] private GameObject buttonNextRound;
     [SerializeField] private TeamCombatScoreManager _5vs5 = default;
     [SerializeField] private AudioSource _chicharra = default;
     private ScoreManager _scoreManager;
@@ -38,28 +29,53 @@ public class Timer : MonoBehaviour
         }
     }
 
+
+    #region CombatStates
+    private void Awake()
+    {
+        SubscribeToGameManagerCombatState();
+    }
+    private void SubscribeToGameManagerCombatState()//Subscribe to Game Manager to receive Game State notifications when it changes
+    {
+        GameManager.GetInstance().OnCombatStateChange += OnCombatStateChange;
+        OnCombatStateChange(GameManager.GetInstance().GetCurrentCombatState());
+    }
+
+    private void OnCombatStateChange(CombatStates _newCombateState)
+    {
+        switch (_newCombateState)
+        {
+            case CombatStates.RESET_STATE:
+                _actualRound = 1;
+                _timeLeft = roundDuration - 1;
+                GameManager.GetInstance().ChangeCombatState(CombatStates.PAUSE_STATE);
+                break;
+        }
+    }
+    
+
+    #endregion
+  
+
     void Update()
     {
         if (_actualRound > _numRounds)
         {
             _scoreManager.DeterminateWinner();
         }
-        if (_timerIsOn)
+        if (GameManager.GetInstance().GetCurrentCombatState() == CombatStates.COMBAT_STATE)
         {
-            _break.SetActive(false);
-            DetectionManager.GetComponent<DetectionManager>().BreakOff();
-            _TimerTxt.enabled = true;
             RoundTimer();
-            UpdateTimer(_timeLeft, _TimerTxt);
+            UpdateTimer(_timeLeft, UIManager.GetInstance().GetTimerTxt());
         }
-        else
+        else if(GameManager.GetInstance().GetCurrentCombatState() == CombatStates.BREAK_STATE)
         {
             BreakTime();
         }
 
         if (_actualRound == _numRounds)
         {
-            Destroy(buttonNextRound);
+           UIManager.GetInstance().GetNextRoundButton().SetActive(false);
         }
     }
     
@@ -74,9 +90,10 @@ public class Timer : MonoBehaviour
             else
             {
                 _chicharra.Play();
-                _timerIsOn = false;
-                if (_5vs5 != null) RoundCheckChange();
+                GameManager.GetInstance().ChangeCombatState(CombatStates.BREAK_STATE);
+                if (_5vs5 == null) RoundCheckChange();
                 else RoundChange();
+                
             }
         }
     }
@@ -87,7 +104,7 @@ public class Timer : MonoBehaviour
         float minutes = Mathf.FloorToInt(currentTimer / 60);
         float seconds = Mathf.FloorToInt(currentTimer % 60);
         cronometer.text = String.Format("{0:00} : {1:00}", minutes, seconds);
-        _roundTxt.text = _actualRound.ToString("0");
+         UIManager.GetInstance().GetRoundTxt().text = _actualRound.ToString("0");
     }
 
     public void RoundCheckChange()
@@ -117,10 +134,7 @@ public class Timer : MonoBehaviour
 
     private void BreakTime()
     {
-        DetectionManager.GetComponent<DetectionManager>().breakOn();
-        _TimerTxt.enabled = false;
-        UpdateTimer(_timeBreak, _breakTxt);
-        _break.SetActive(true);
+        UpdateTimer(_timeBreak, UIManager.GetInstance().GetBreakTxt());
         if (_timeBreak > 0)
         {
             _timeBreak -= Time.deltaTime;
@@ -128,7 +142,7 @@ public class Timer : MonoBehaviour
         else
         {
             _chicharra.Play();
-            _timerIsOn = true;
+            GameManager.GetInstance().ChangeCombatState(CombatStates.COMBAT_STATE);
             _timeBreak = _breakDuration;
         }
     }

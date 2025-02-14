@@ -1,31 +1,58 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
     Timer _timer;
-    [SerializeField] private GameObject _deciderCanvas = default;
-    [SerializeField] private GameObject _break = default;
+   
+    [Header("Combat Data")]
     [SerializeField] private int RedScore = 0;
     [SerializeField] private int BlueScore = 0;
     [SerializeField] private int BlueGameJeum = 0;
     [SerializeField] private int RedGameJeum = 0;
-    [SerializeField] private TextMeshProUGUI _timerTXT = default;
-    [SerializeField] private TextMeshProUGUI _redRoundsTXT = default;
-    [SerializeField] private TextMeshProUGUI _blueRoundsTXT = default;
-    [SerializeField] private TextMeshProUGUI round = default;
-    [SerializeField] private TextMeshProUGUI _RedGamJeom = default;
-    [SerializeField] private TextMeshProUGUI _BlueGamJeom = default;
-    [SerializeField] private GameObject _endCanvas = default;
     [SerializeField] private int RedRoundWins = default;
     [SerializeField] private int BlueRoundWins = default;
     
 
     [Header("ScoreManager")] 
-    [SerializeField] private TextMeshProUGUI BlueText = default;
-    [SerializeField] private TextMeshProUGUI RedText = default;
+    
     [SerializeField] private GameObject RedColor = default;
     [SerializeField] private GameObject BlueColor = default;
+
+    private void SubscribeToGameManagerCombatState()//Subscribe to Game Manager to receive Game State notifications when it changes
+    {
+        GameManager.GetInstance().OnCombatStateChange += OnCombatStateChange;
+        OnCombatStateChange(GameManager.GetInstance().GetCurrentCombatState());
+    }
+
+    private void OnCombatStateChange(CombatStates _newCombateState)
+    {
+        switch (_newCombateState )
+        {
+            case CombatStates.RESET_STATE:
+            ResetAll();
+                break;
+        }
+    }
+
+    private void ResetAll()
+    {
+        RestartScore();
+        RedRoundWins = 0;
+        BlueRoundWins = 0;
+        UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetRedRoundText(), RedRoundWins);
+        UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetRedRoundText(), BlueRoundWins);
+        RedColor.GetComponent<Renderer>().material.color = Color.red;
+        BlueColor.GetComponent<Renderer>().material.color = Color.blue;
+        RedColor.GetComponent<BlinkingColor>().enabled = false;
+        BlueColor.GetComponent<BlinkingColor>().enabled = false;
+    }
+
+    private void Awake()
+    {
+       SubscribeToGameManagerCombatState();
+    }
 
     private void Start()
     {
@@ -54,13 +81,17 @@ public class ScoreManager : MonoBehaviour
 
     private void Score(bool isRed, int pointToScore)
     {
+        
         if (isRed)
         {
             RedScore += pointToScore;
+            UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetRedTextScore(), RedScore);
+          
         }
         else
         {
             BlueScore += pointToScore;
+            UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetBlueTextScore(), BlueScore);
         }
     }
 
@@ -69,43 +100,58 @@ public class ScoreManager : MonoBehaviour
        float difference = Mathf.Abs(RedScore - BlueScore);
         if (difference >= BattleManager.instance.PointDifference)
         {
-            _timer._timerIsOn = false;
+            GameManager.GetInstance().ChangeCombatState(CombatStates.BREAK_STATE);
             _timer.RoundCheckChange();
         }
     }
     
 
-    private void Update()
-    {
-        UpdateText(BlueText, BlueScore);
-        UpdateText(RedText, RedScore);
-        if (BlueGameJeum >= BattleManager.instance.GameJeum)
-        {
-            WinnerRound(true);
-            _timer._timerIsOn = false;
-        }
-        if (RedGameJeum >= BattleManager.instance.GameJeum)
-        {
-            WinnerRound(false);
-            _timer._timerIsOn = false;
-        }
-    }
-
     public void AddGamJeum(bool isRed)
     {
         if (isRed)
         {
-            BlueScore++;
+            Score(false, 1);
             RedGameJeum++;
-            UpdateText(_RedGamJeom,RedGameJeum);
+            UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetRedGameJeom(), RedGameJeum);
         }
         else
         {
-            RedScore++;
+            Score(true, 1);
             BlueGameJeum++;
-            UpdateText(_BlueGamJeom, BlueGameJeum);
+            UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetBlueGameJeom(), BlueGameJeum);
         }
-        DifferenceCheck();
+        if (BlueGameJeum >= BattleManager.instance.GameJeum)
+        {
+            _timer.RoundChange();
+            WinnerRound(true);
+            if (RoundDifferenceCheck())
+            {
+                DeterminateWinner();
+            }
+            else
+            {
+                GameManager.GetInstance().ChangeCombatState(CombatStates.BREAK_STATE);
+            }
+          
+        }
+        else if (RedGameJeum >= BattleManager.instance.GameJeum)
+        {
+            _timer.RoundChange();
+            WinnerRound(false);
+            if (RoundDifferenceCheck())
+            {
+                DeterminateWinner();
+            }
+            else
+            {
+                GameManager.GetInstance().ChangeCombatState(CombatStates.BREAK_STATE);
+            }
+        }
+        else
+        {
+            DifferenceCheck();
+        }
+        
     }
 
     public void RemoveGamJeum(bool isRed)
@@ -114,18 +160,18 @@ public class ScoreManager : MonoBehaviour
         {
             if (RedGameJeum > 0)
             {
-                BlueScore--;
+                Score(false, -1);
                 RedGameJeum--;
-                UpdateText(_RedGamJeom,RedGameJeum);
+                UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetRedGameJeom(), RedGameJeum);
             }
         }
         else
         {
             if (BlueGameJeum > 0)
             {
-                RedScore--;
+                Score(true, -1);
                 BlueGameJeum--;
-                UpdateText(_BlueGamJeom, BlueGameJeum);
+                UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetBlueGameJeom(), BlueGameJeum);
             }
         }
         DifferenceCheck();
@@ -135,11 +181,11 @@ public class ScoreManager : MonoBehaviour
     {
         if (isRed)
         {
-            RedScore++;
+            Score(true, 1);
         }
         else
         {
-            BlueScore++;
+            Score(false, 1);
         }
         DifferenceCheck();
     }
@@ -150,14 +196,14 @@ public class ScoreManager : MonoBehaviour
         {
             if (RedScore > 0)
             {
-                RedScore--;
+                Score(true, -1);
             }
         }
         else
         {
             if (BlueScore > 0)
             {
-                BlueScore--;
+                Score(false, -1);
             }
         }
         DifferenceCheck();
@@ -176,7 +222,7 @@ public class ScoreManager : MonoBehaviour
         else if (BlueRoundWins == RedRoundWins)
         {
             RestartScore();
-            _deciderCanvas.SetActive(true);
+            UIManager.GetInstance().GetDeciderCanvas().SetActive(true);
             StopTimer();
         }
     }
@@ -186,16 +232,27 @@ public class ScoreManager : MonoBehaviour
         if (redWins)
         {
             RedRoundWins++;
-            UpdateText(_redRoundsTXT, RedRoundWins);
+            UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetRedRoundText(), RedRoundWins);
         }
         else
         {
             BlueRoundWins++;
-            UpdateText(_blueRoundsTXT, BlueRoundWins);
+            UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetBlueRoundText(), BlueRoundWins);
         }
         RestartScore();
-        UpdateText(_RedGamJeom,RedGameJeum);
-        UpdateText(_BlueGamJeom,BlueGameJeum);
+        if ( RoundDifferenceCheck())
+        {
+            DeterminateWinner();
+        }
+
+       
+    }
+
+    private bool RoundDifferenceCheck()
+    {
+
+        return RedRoundWins > (float)BattleManager.instance.NumberOfRounds / 2 ||
+                BlueRoundWins > (float)BattleManager.instance.NumberOfRounds / 2;
     }
 
     public void WinnerRoundCheck()
@@ -221,6 +278,10 @@ public class ScoreManager : MonoBehaviour
         BlueScore = 0;
         BlueGameJeum = 0;
         RedGameJeum = 0;
+        UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetBlueTextScore(), BlueScore);
+        UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetBlueGameJeom(), BlueGameJeum);
+        UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetRedGameJeom(), RedGameJeum);
+        UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetRedTextScore(), RedScore);
     }
     
 
@@ -228,20 +289,16 @@ public class ScoreManager : MonoBehaviour
     {
         winnerColor.GetComponent<BlinkingColor>().enabled = true;
         StopTimer();
-        _endCanvas.SetActive(true);
-        _deciderCanvas.SetActive(false);
+        UIManager.GetInstance().GetDeciderCanvas().SetActive(false);
     }
+    
 
     private void StopTimer()
     {
-        Destroy(_break);
-        _timer.enabled = false;
-        _timerTXT.enabled = false;
-        round.enabled = false;
+       GameManager.GetInstance().ChangeCombatState(CombatStates.END_STATE);
     }
 
-    private void UpdateText(TextMeshProUGUI text, int quantity)
-    {
-        text.text = quantity.ToString("0");
-    }
+   
+  
 }
+

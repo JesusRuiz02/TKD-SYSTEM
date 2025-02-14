@@ -1,17 +1,18 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class TableSystem : MonoBehaviour
 {
+    [Header("Inputs")]
     private TableManager _tableManager;
-   [SerializeField] private ScoreManager _scoreManager;
-    [SerializeField] private bool isPaused = default;
     private InputAction _inputPause = default;
     private InputAction _addRedGamJeom = default;
     private InputAction _addBlueGamJeom = default;
-    [SerializeField] private GameObject pauseUI = default;
-    [SerializeField] private GameObject[] _refereeList = default;
-    [SerializeField] private GameObject _counterManager = default;
+    [Header("Table System")]
+    [SerializeField] private ScoreManager _scoreManager;
+    
+    
 
     private void OnEnable()
     {
@@ -35,28 +36,29 @@ public class TableSystem : MonoBehaviour
 
     private void Awake()
     {
+        SubscribeToGameManagerCombatState();
         _tableManager = new TableManager();
+    }
+    
+    private void SubscribeToGameManagerCombatState()//Subscribe to Game Manager to receive Game State notifications when it changes
+    {
+        GameManager.GetInstance().OnCombatStateChange += OnCombatStateChange;
+        OnCombatStateChange(GameManager.GetInstance().GetCurrentCombatState());
+    }
+
+    private void OnCombatStateChange(CombatStates _newCombateState)
+    {
+       /* switch (_newCombateState )
+        {
+            
+        }*/
     }
 
     private void Start()
     {
-        isPaused = false;
         _scoreManager = GetComponent<ScoreManager>();
-        _counterManager = GameObject.FindGameObjectWithTag("Counter");
     }
-
-    private void Update()
-    {
-        Pause();
-        if (isPaused)
-        {
-            DisableReferee();
-        }
-        else
-        {
-            ActivateReferee();
-        }
-    }
+    
 
     private void AddBlueGamJeom(InputAction.CallbackContext context)
     {
@@ -73,25 +75,19 @@ public class TableSystem : MonoBehaviour
 
     private void Toggle()
     {
-        isPaused = !isPaused;
-    }
-    private void Pause()
-    {
-        var TimeScale = isPaused ? 0 : 1;
-        Time.timeScale = TimeScale;
-        pauseUI.SetActive(isPaused);
+        switch (GameManager.GetInstance().GetCurrentCombatState())
+        {
+            case CombatStates.PAUSE_STATE:
+                GameManager.GetInstance().ChangeCombatState(CombatStates.COMBAT_STATE);
+                    break;
+            case CombatStates.COMBAT_STATE:
+                GameManager.GetInstance().ChangeCombatState(CombatStates.PAUSE_STATE);
+                break;
+        }
     }
 
-    private void ActivateReferee()
-    {
-       _counterManager.GetComponent<DetectionManager>().PlayReferee();
-    }
-    public void FindTheControllers()
-    {
-        _refereeList = GameObject.FindGameObjectsWithTag("Referee");
-    }
-    private void DisableReferee()
-    {
-        _counterManager.GetComponent<DetectionManager>().StopReferee();
-    }
+ 
+    
+    
+  
 }

@@ -10,12 +10,11 @@ public class DetectionManager : MonoBehaviour
     [SerializeField] private bool TeamCombat = default; 
     private ScoreManager scoreManager = default;
     private TeamCombatScoreManager teamCombatScoreManager = default;
-    [SerializeField] private bool _breakflag = default;
     [SerializeField] private float _windowIsOpened = 1f;
     [SerializeField] private int[] blueCounter = default;
     [SerializeField] private int[] redCounter = default;
     [SerializeField] private GameObject _scoreManager = default;
-    [SerializeField] private bool isPaused = false;
+    
     [Header("Images")]
     [SerializeField] private GameObject _chestPlateBlue = default;
     [SerializeField] private GameObject _chestPlateRed = default;
@@ -27,11 +26,16 @@ public class DetectionManager : MonoBehaviour
     [SerializeField] private GameObject _punchBlue= default;
     [SerializeField] private int _numberOfJudges = 0;
     [SerializeField] private int minim_votes = default;
-    
+
+    public void SetNumberOfJudges(int judgesCounts)
+    {
+        _numberOfJudges = judgesCounts;
+    }
+
     
     public void WindowIsOpened(int numAction, bool isRed, int numController)
     {
-        if (!isPaused && !_breakflag)
+        if (GameManager.GetInstance().GetCurrentCombatState() == CombatStates.COMBAT_STATE)
         {
             if (isRed)
             {
@@ -141,25 +145,7 @@ public class DetectionManager : MonoBehaviour
         }
     }
     
-    public void StopReferee()
-    {
-        isPaused = true;
-    }
-
-    public void breakOn()
-    {
-        _breakflag = true;
-    }
-
-    public void BreakOff()
-    {
-        _breakflag = false;
-    }
-
-    public void PlayReferee()
-    {
-        isPaused = false;
-    }
+    
 
     private void Start()
     {
