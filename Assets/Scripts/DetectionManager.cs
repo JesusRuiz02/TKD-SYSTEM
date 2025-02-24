@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Xml.Schema;
 using Unity.Mathematics;
@@ -131,18 +132,13 @@ public class DetectionManager : MonoBehaviour
 
     private void RefereeCheck()
     {
-        if (_numberOfJudges <= 2)
+        float result = _numberOfJudges / 2f;
+        minim_votes = Mathf.CeilToInt(result);
+        if (_numberOfJudges % 2 == 0)
         {
-            minim_votes = 1;
+            minim_votes++;
         }
-        else if(_numberOfJudges <= 4)
-        {
-            minim_votes = 2;
-        }
-        else if (_numberOfJudges >= 5)
-        {
-            minim_votes = 3;
-        }
+        
     }
     
     

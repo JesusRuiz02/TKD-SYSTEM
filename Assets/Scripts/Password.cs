@@ -1,21 +1,33 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Password : MonoBehaviour
 {
-   [SerializeField] private TMP_InputField inputfield;  
  
+   [SerializeField] private TMP_InputField _eventNameField; 
+   [SerializeField] private TMP_InputField _areaNumberField;
+   [SerializeField] private Animation _areaAnimation;
+   [SerializeField] private Animation _eventAnimation;
     public void CheckInput() {
-        if (inputfield.text == "BFGD-2310-LCME-2407")      // check inputfield contains the string password
+        if (_eventNameField.text != "" && _areaNumberField.text != "")
         {
-            Debug.Log("Password accepted");     // just a debug.Log to show that the password is correct (can be removed)
-            SceneManager.LoadScene("MainMenu");  // fill in the name of the scene you want to load
+            SceneManager.LoadScene("MainMenu");
+            PlayerPrefs.SetString("EventName",_eventNameField.text);
+            PlayerPrefs.SetInt("AreaNumber", int.Parse(_areaNumberField.text));
         }
+        else
+        {
+            if (_eventNameField.text == "") _eventAnimation.Play();
+            if (_areaNumberField.text == "") _areaAnimation.Play();
+        }
+       
     }
 
-    private void FixedUpdate()
+    private void Start()
     {
-        CheckInput();
+        _areaNumberField.contentType = TMP_InputField.ContentType.IntegerNumber;
+        _areaNumberField.characterLimit = 2;
     }
 }

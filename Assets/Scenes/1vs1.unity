@@ -287,6 +287,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a3e12a788899d74a9c7dcd62f0f327c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _combatData: {fileID: 11400000, guid: c8754723aa28500439624576b282c6b2, type: 2}
+  _scoreManager: {fileID: 403211967}
   currentCombatState: 1
 --- !u!4 &37513650
 Transform:
@@ -1643,7 +1645,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Next Round
+  m_text: Exit
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2189,6 +2191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26a82e847d820ca4882985b5d5473897, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _combatData: {fileID: 11400000, guid: c8754723aa28500439624576b282c6b2, type: 2}
   RedScore: 0
   BlueScore: 0
   BlueGameJeum: 0
@@ -2592,7 +2595,7 @@ GameObject:
   - component: {fileID: 455239192}
   - component: {fileID: 455239195}
   m_Layer: 0
-  m_Name: NextRound
+  m_Name: Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2663,9 +2666,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 403211965}
-        m_TargetAssemblyTypeName: Timer, Assembly-CSharp
-        m_MethodName: RoundChange
+      - m_Target: {fileID: 37513649}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: Exit
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6806,7 +6809,7 @@ MonoBehaviour:
         m_MethodName: ColorWinner
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 771415015}
+          m_ObjectArgument: {fileID: 2028860248}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0

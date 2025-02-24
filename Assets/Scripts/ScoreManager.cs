@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -5,15 +6,25 @@ using UnityEngine;
 public class ScoreManager : MonoBehaviour
 {
     Timer _timer;
-   
-    [Header("Combat Data")]
+
+    [Header("Combat Data")] 
+    [SerializeField] private CombatData _combatData;
     [SerializeField] private int RedScore = 0;
     [SerializeField] private int BlueScore = 0;
     [SerializeField] private int BlueGameJeum = 0;
     [SerializeField] private int RedGameJeum = 0;
     [SerializeField] private int RedRoundWins = default;
     [SerializeField] private int BlueRoundWins = default;
-    
+
+    public int GetBlueRoundWins()
+    {
+        return BlueRoundWins;
+    }
+    public int GetRedRoundWins()
+    {
+        return RedRoundWins;
+    }
+
 
     [Header("ScoreManager")] 
     
@@ -32,6 +43,7 @@ public class ScoreManager : MonoBehaviour
         {
             case CombatStates.RESET_STATE:
             ResetAll();
+            _combatData.AddCombat();
                 break;
         }
     }
@@ -211,9 +223,12 @@ public class ScoreManager : MonoBehaviour
 
     public void DeterminateWinner()
     {
+        _combatData.GetCombatInfo()[_combatData.GetCombatInfo().Count - 1].SetCombatResult(GetBlueRoundWins() + " - " + GetRedRoundWins());
+        _combatData.GetCombatInfo()[_combatData.GetCombatInfo().Count - 1].SetWinnerReason(WinnerReasons.RoundWinner);
         if (RedRoundWins > BlueRoundWins)
         {
            ColorWinner(RedColor);
+          
         }
         else if (BlueRoundWins > RedRoundWins)
         {
@@ -222,6 +237,7 @@ public class ScoreManager : MonoBehaviour
         else if (BlueRoundWins == RedRoundWins)
         {
             RestartScore();
+            _combatData.GetCombatInfo()[_combatData.GetCombatInfo().Count - 1].SetWinnerReason(WinnerReasons.RefereeDecision);
             UIManager.GetInstance().GetDeciderCanvas().SetActive(true);
             StopTimer();
         }
@@ -287,6 +303,7 @@ public class ScoreManager : MonoBehaviour
 
     public void ColorWinner(GameObject winnerColor)
     {
+        _combatData.GetCombatInfo()[_combatData.GetCombatInfo().Count - 1].SetWinner(winnerColor.name == "RED");
         winnerColor.GetComponent<BlinkingColor>().enabled = true;
         StopTimer();
         UIManager.GetInstance().GetDeciderCanvas().SetActive(false);
