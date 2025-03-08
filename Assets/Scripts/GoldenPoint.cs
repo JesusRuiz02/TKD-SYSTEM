@@ -35,14 +35,12 @@ public class GoldenPoint : MonoBehaviour
         if (_timerIsOn)
         {
             _break.SetActive(false);
-            DetectionManager.GetComponent<DetectionManager>().BreakOff();
             _TimerTxt.enabled = true;
             RoundTimer();
             UpdateTimer(_timeLeft, _TimerTxt);
         }
         else
         {
-            DetectionManager.GetComponent<DetectionManager>().breakOn();
             _TimerTxt.enabled = false;
             BreakTime();
             UpdateTimer(_timeBreak,_breakTxt);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Users;
@@ -18,9 +19,30 @@ public class RefereeController : MonoBehaviour
 
     public event Action<PlayerInput> onDeviceLost;
     
+    private void Awake()
+    {
+        SubscribeToGameManagerCombatState();
+    }
+
+    private void SubscribeToGameManagerCombatState()//Subscribe to Game Manager to receive Game State notifications when it changes
+    {
+        GameManager.GetInstance().OnCombatStateChange += OnCombatStateChange;
+        OnCombatStateChange(GameManager.GetInstance().GetCurrentCombatState());
+    }
+
+    private void OnCombatStateChange(CombatStates _newCombateState)
+    {
+        switch (_newCombateState )
+        {
+            case CombatStates.PAUSE_STATE:
+                break;
+            case CombatStates.COMBAT_STATE:
+                break;
+        }
+    }
     public void HelmetBlue(InputAction.CallbackContext context)
     {
-        if(context.performed)
+        if(context.performed && GameManager.GetInstance().GetCurrentCombatState() == CombatStates.COMBAT_STATE)
         {
             if (!blueScoreDelay[2])
             {
@@ -30,9 +52,10 @@ public class RefereeController : MonoBehaviour
             }
         }
     }
+
     public void HelmetRed(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && GameManager.GetInstance().GetCurrentCombatState() == CombatStates.COMBAT_STATE)
         {
             if (!redScoreDelay[2])
             {
@@ -43,9 +66,9 @@ public class RefereeController : MonoBehaviour
 
         }
     }
-    public void ChestPlateRed(InputAction.CallbackContext context)
+    public void ChestPlateRed(InputAction.CallbackContext context )
     {
-        if (context.performed)
+        if (context.performed && GameManager.GetInstance().GetCurrentCombatState() == CombatStates.COMBAT_STATE)
         {
             if (!redScoreDelay[1])
             {
@@ -58,7 +81,7 @@ public class RefereeController : MonoBehaviour
     }
     public void ChestPlateBlue(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && GameManager.GetInstance().GetCurrentCombatState() == CombatStates.COMBAT_STATE)
         {
             if (!blueScoreDelay[1])
             {
@@ -71,7 +94,7 @@ public class RefereeController : MonoBehaviour
     }
     public void PunchBlue(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && GameManager.GetInstance().GetCurrentCombatState() == CombatStates.COMBAT_STATE)
         {
             if (!blueScoreDelay[0])
             {
@@ -83,7 +106,7 @@ public class RefereeController : MonoBehaviour
     }
     public void PunchRed(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && GameManager.GetInstance().GetCurrentCombatState() == CombatStates.COMBAT_STATE)
         {
             if (!redScoreDelay[0])
             {
@@ -95,7 +118,7 @@ public class RefereeController : MonoBehaviour
     }
     public void TwistRed(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && GameManager.GetInstance().GetCurrentCombatState() == CombatStates.COMBAT_STATE)
         {
             if (!redScoreDelay[3])
             {
@@ -107,7 +130,7 @@ public class RefereeController : MonoBehaviour
     }
     public void TwistBlue(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && GameManager.GetInstance().GetCurrentCombatState() == CombatStates.COMBAT_STATE)
         {
             if (!blueScoreDelay[3])
             {
@@ -135,7 +158,6 @@ public class RefereeController : MonoBehaviour
         tableManager = GameObject.FindGameObjectWithTag("ScoreManager");
         detectionManager = GameObject.FindGameObjectWithTag("Counter");
         battleManager = GameObject.FindGameObjectWithTag("Data");
-        tableManager.GetComponent<TableSystem>().FindTheControllers();
         timerDelay = battleManager.GetComponent<BattleManager>().WindowTime;
         username = GetComponent<PlayerInput>().playerIndex;
         detectionManager.GetComponent<DetectionManager>().AddReferee();
@@ -144,6 +166,8 @@ public class RefereeController : MonoBehaviour
         {
             loadingScreen.GetComponent<LoadingScreen>().AddReferee();
         }
+        PairManager.GetInstance().FindTheControllers(gameObject);
+        
     }
     
 }
