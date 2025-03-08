@@ -54,7 +54,7 @@ public class ScoreManager : MonoBehaviour
         RedRoundWins = 0;
         BlueRoundWins = 0;
         UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetRedRoundText(), RedRoundWins);
-        UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetRedRoundText(), BlueRoundWins);
+        UIManager.GetInstance().UpdateText(UIManager.GetInstance().GetBlueRoundText(), BlueRoundWins);
         RedColor.GetComponent<Renderer>().material.color = Color.red;
         BlueColor.GetComponent<Renderer>().material.color = Color.blue;
         RedColor.GetComponent<BlinkingColor>().enabled = false;

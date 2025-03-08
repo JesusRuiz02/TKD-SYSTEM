@@ -72,11 +72,7 @@ public class Timer : MonoBehaviour
         {
             BreakTime();
         }
-
-        if (_actualRound == _numRounds)
-        {
-           UIManager.GetInstance().GetNextRoundButton().SetActive(false);
-        }
+        
     }
     
     private void RoundTimer()

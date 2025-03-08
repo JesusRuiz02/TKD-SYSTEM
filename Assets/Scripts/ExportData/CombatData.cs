@@ -5,7 +5,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "DataInfo", menuName = "ScriptableObjects/DataInfo", order = 1)]
 public class CombatData : ScriptableObject
 {
-    [SerializeField] private string _nameEvent = default;
     [SerializeField] private List<CombatInfo> _combatInfos = new List<CombatInfo>();
     private int _area = 0;
     
@@ -37,7 +36,7 @@ public class CombatData : ScriptableObject
    public void SetDate()
    {
        DateTime dateTime = DateTime.Now;
-       _date = dateTime.ToString("dd/MM/yyyy");
+       _date = dateTime.ToString("dd-MM-yyyy");
        
    }
 
@@ -52,6 +51,7 @@ public class CombatData : ScriptableObject
        combatInfo.SetWinnerReason(WinnerReasons.MatchUnfinished);
        _combatCount++; 
        SetCombatID();
+       UIManager.GetInstance().SetCombatIDText(combatID.ToString());
        combatInfo.SetCombatID(combatID);
        combatInfo.SetHour(GetHour());
        _combatInfos.Add(combatInfo);
@@ -91,6 +91,7 @@ public class CombatInfo
     }
     public void SetCombatResult(string result)
     {
+        Debug.Log(result);
         _combatResult = result;
     }
     private string _winner = String.Empty;

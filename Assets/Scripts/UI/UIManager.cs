@@ -21,6 +21,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _BlueGamJeom = default;
     [SerializeField] private TextMeshProUGUI round = default;
     [SerializeField] private GameObject _endCanvas = default;
+
+    [Header("Combat Data")]
+    [SerializeField] private TextMeshProUGUI CombatID;
+    
     
     #region SingleTone
     private static UIManager _instance;
@@ -87,6 +91,11 @@ public class UIManager : MonoBehaviour
     
 
     #endregion
+
+    public void SetCombatIDText(string combatID)
+    {
+        CombatID.text = combatID;
+    }
 
     public TextMeshProUGUI GetBlueTextScore()
     {

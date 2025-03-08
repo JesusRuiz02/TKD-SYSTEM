@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using SFB;
+using Unity.VisualScripting;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -49,6 +51,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        _combatData.SetArea(PlayerPrefs.GetInt("AreaNumber",1));
         _combatData.Reset();
         _combatData.AddCombat();
         _combatData.SetDate();
@@ -74,6 +77,7 @@ public class GameManager : MonoBehaviour
 
     private void ExportCsv(List<CombatInfo> combatInfo)
     {
+        string path = "";
         List<object[]> data = new List<object[]>
         {
             new object[]{"CombatID", "Result", "Winner", "Winner Reason", "Hour"}
@@ -86,18 +90,41 @@ public class GameManager : MonoBehaviour
                 combat.GetHour()
             };
             data.Add(obj);
+        } 
+        path = PlayerPrefs.GetString("PathToExport", "");
+        if (string.IsNullOrEmpty(path))
+        { 
+            path = SelectFolder();
+            if (string.IsNullOrEmpty(path))
+            {
+                path = Application.persistentDataPath;
+            }
+            else
+            {
+                PlayerPrefs.SetString("PathToExport", path);
+                PlayerPrefs.Save();
+            }
         }
         
-        string directoryPath = Path.Combine(Application.persistentDataPath, "Results");
+        string fileName =  PlayerPrefs.GetString("EventName") + "_" + _combatData.GetArea() + "_" + _combatData.GetDate()+ ".csv";
+        print(fileName);
+        string filePath = Path.Combine(path, fileName);
+        print(filePath);
         
-        if (!Directory.Exists(directoryPath))
-        {
-            Directory.CreateDirectory(directoryPath);
-        }
-
-        string filePath = Path.Combine(directoryPath,
-            PlayerPrefs.GetString("EventName") + "_" + _combatData.GetArea() + "_" + _combatData.GetDate()+ ".csv");
         ExportToCSV(data, filePath);
+    }
+    
+    private string SelectFolder()
+    {
+        string[] paths = StandaloneFileBrowser.OpenFolderPanel("Seleccionar carpeta", "", false);
+        if (paths.Length == 0 || string.IsNullOrEmpty(paths[0]))
+        {
+            Debug.Log("No se seleccionó ninguna carpeta.");
+            return "";
+        }
+        string directoryPath = paths[0]; 
+        PlayerPrefs.SetString("PathToExport", directoryPath);
+        return directoryPath;
     }
 
     private void ExportToCSV(List<object[]> data, string filePath)
